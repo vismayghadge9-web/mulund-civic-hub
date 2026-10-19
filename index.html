@@ -71,7 +71,40 @@ header {
       font-size: 21px;
     }
     .brand small { display: block; color: #c9d8f0; font-weight: 400; }
-    .navlinks { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 14px; }
+    
+.navlinks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+
+.navlinks a {
+  color: #E5EEFF;
+  text-decoration: none;
+  padding: 9px 12px;
+  border-radius: 10px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navlinks a:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.navlinks .login {
+  color: #FFFFFF;
+  padding: 9px 15px;
+  border: 1px solid #8BA8D0;
+  border-radius: 10px;
+}
+
+.navlinks .login:hover {
+  background: #2563EB;
+  border-color: #2563EB;
+}
+    
     .navlinks a:hover { color: #9bc6ff; }
     .navlinks .login {
       padding: 9px 15px; border: 1px solid #8ba8d0; border-radius: 9px;
