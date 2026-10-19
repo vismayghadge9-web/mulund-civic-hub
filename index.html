@@ -428,7 +428,7 @@ async function savePolicyAcceptance(userId) {
         await savePolicyAcceptance(result.data.user.id);
         localStorage.removeItem("mch_pending_policy_acceptance_v1");
         authMessage.textContent =
-          "Account created, signed in, and policy acceptance recorded.";
+          "Account created and signed in. Policy acceptance save completed.";
       } else {
         const user = result.data.user;
 
