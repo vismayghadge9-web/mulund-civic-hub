@@ -551,5 +551,36 @@
   );
 </script>
   
+<section id="admin-dashboard" style="max-width:1000px;margin:30px auto;padding:24px;background:#f1f5f9;border-radius:16px;font-family:Arial,sans-serif;color:#102a43;">
+  <h2>Mulund Civic Hub — Admin Dashboard</h2>
+  <p>Manage and track civic complaints submitted by residents.</p>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;">
+    <div style="background:white;padding:16px;border-radius:12px;flex:1;min-width:120px;">
+      <p>Total Complaints</p>
+      <h2 id="admin-total">—</h2>
+    </div>
+    <div style="background:white;padding:16px;border-radius:12px;flex:1;min-width:120px;">
+      <p>Submitted</p>
+      <h2 id="admin-submitted">—</h2>
+    </div>
+    <div style="background:white;padding:16px;border-radius:12px;flex:1;min-width:120px;">
+      <p>In Progress</p>
+      <h2 id="admin-progress">—</h2>
+    </div>
+    <div style="background:white;padding:16px;border-radius:12px;flex:1;min-width:120px;">
+      <p>Resolved</p>
+      <h2 id="admin-resolved">—</h2>
+    </div>
+  </div>
+
+  <button id="admin-load-complaints" type="button" style="padding:12px 18px;background:#155eef;color:white;border:0;border-radius:8px;font-weight:bold;">
+    Load All Complaints
+  </button>
+
+  <p id="admin-message" role="status" aria-live="polite"></p>
+  <div id="admin-complaints-list"></div>
+</section>
+  
 </body>
 </html>
