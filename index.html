@@ -636,30 +636,97 @@ document.getElementById("admin-load-complaints").addEventListener("click", async
       return;
     }
 
-    complaints.forEach(c => {
-      const card = document.createElement("article");
-      card.style.cssText =
-        "background:white;padding:16px;margin:12px 0;border:1px solid #cbd5e1;border-radius:12px;overflow-wrap:anywhere;";
+    
+complaints.forEach(c => {
+  const card = document.createElement("article");
+  card.style.cssText =
+    "background:white;padding:16px;margin:12px 0;border:1px solid #cbd5e1;border-radius:12px;overflow-wrap:anywhere;";
 
-      const title = document.createElement("h3");
-      title.textContent = c.title;
+  const title = document.createElement("h3");
+  title.textContent = c.title;
 
-      const details = document.createElement("p");
-      details.textContent = c.category + " · " + c.area;
+  const details = document.createElement("p");
+  details.textContent = c.category + " · " + c.area;
 
-      const description = document.createElement("p");
-      description.textContent = c.description;
+  const description = document.createElement("p");
+  description.textContent = c.description;
 
-      const status = document.createElement("p");
+  const date = document.createElement("p");
+  date.textContent = "Submitted: " + new Date(c.created_at).toLocaleString();
+
+  const statusLabel = document.createElement("label");
+  statusLabel.textContent = "Update status: ";
+
+  const statusSelect = document.createElement("select");
+  ["Submitted", "In Review", "In Progress", "Resolved"].forEach(value => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    statusSelect.append(option);
+  });
+  statusSelect.value = c.status;
+  statusSelect.style.cssText = "padding:10px;margin:8px;border:1px solid #cbd5e1;border-radius:8px;";
+
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.textContent = "Save Status";
+  saveButton.style.cssText = "padding:10px 14px;background:#155eef;color:white;border:0;border-radius:8px;";
+
+  const result = document.createElement("p");
+  result.setAttribute("role", "status");
+
+  saveButton.addEventListener("click", async () => {
+    saveButton.disabled = true;
+    result.textContent = "Saving status...";
+
+    try {
+      const { data: userData, error: userError } =
+        await civicSupabase.auth.getUser();
+
+      if (userError || !userData.user) {
+        result.textContent = "Please sign in again.";
+        return;
+      }
+
+      const { data: adminRecord, error: adminError } = await civicSupabase
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+
+      if (adminError || !adminRecord) {
+        result.textContent = "Admin access denied.";
+        return;
+      }
+
+      const { error } = await civicSupabase
+        .from("complaints")
+        .update({ status: statusSelect.value })
+        .eq("id", c.id);
+
+      if (error) {
+        result.textContent = "Could not save status. Please try again.";
+        return;
+      }
+
+      c.status = statusSelect.value;
       status.textContent = "Current status: " + c.status;
+      result.textContent = "Status updated successfully!";
+    } catch (error) {
+      result.textContent = "Something went wrong. Please try again.";
+    } finally {
+      saveButton.disabled = false;
+    }
+  });
 
-      const date = document.createElement("p");
-      date.textContent = "Submitted: " + new Date(c.created_at).toLocaleString();
+  const status = document.createElement("p");
+  status.textContent = "Current status: " + c.status;
 
-      card.append(title, details, description, status, date);
-      list.append(card);
-    });
-
+  statusLabel.append(statusSelect);
+  card.append(title, details, description, date, status, statusLabel, saveButton, result);
+  list.append(card);
+});
+    
     message.textContent = "Loaded " + complaints.length + " complaint(s).";
   } catch (error) {
     message.textContent = "Something went wrong. Please try again.";
