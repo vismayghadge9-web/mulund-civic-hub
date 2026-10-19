@@ -388,5 +388,36 @@
   );
 </script>
   
+<section id="report" style="max-width:650px;margin:30px auto;padding:24px;background:#f1f5f9;border-radius:16px;font-family:Arial,sans-serif;color:#102a43;">
+  <h2>Report a Civic Issue</h2>
+  <p>Help make Mulund a better place. Tell us about the problem in your area.</p>
+
+  <form id="complaint-form">
+    <label for="complaint-title">Complaint title</label>
+    <input id="complaint-title" type="text" minlength="3" maxlength="120" required placeholder="e.g. Pothole near station" style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border:1px solid #cbd5e1;border-radius:8px;">
+
+    <label for="complaint-category">Category</label>
+    <select id="complaint-category" required style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border:1px solid #cbd5e1;border-radius:8px;">
+      <option value="">Choose a category</option>
+      <option value="Roads">Roads and potholes</option>
+      <option value="Garbage">Garbage</option>
+      <option value="Water">Water supply</option>
+      <option value="Drainage">Drainage</option>
+      <option value="Streetlights">Streetlights</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label for="complaint-area">Area in Mulund</label>
+    <input id="complaint-area" type="text" maxlength="150" required placeholder="e.g. Mulund West, near station" style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border:1px solid #cbd5e1;border-radius:8px;">
+
+    <label for="complaint-description">Describe the issue</label>
+    <textarea id="complaint-description" minlength="10" maxlength="3000" required rows="5" placeholder="Explain the problem and its location..." style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border:1px solid #cbd5e1;border-radius:8px;"></textarea>
+
+    <button type="submit" style="padding:13px 20px;background:#155eef;color:white;border:0;border-radius:8px;font-weight:bold;">Submit Complaint</button>
+
+    <p id="complaint-message" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
 </body>
 </html>
