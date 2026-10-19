@@ -367,6 +367,21 @@
   const emailInput = document.getElementById("resident-email");
   const passwordInput = document.getElementById("resident-password");
 
+const POLICY_VERSION = "2026-10-19-v1";
+
+async function savePolicyAcceptance(userId) {
+  const { error } = await civicSupabase
+    .from("policy_acceptances")
+    .insert({
+      user_id: userId,
+      policy_version: POLICY_VERSION
+    });
+
+  if (error && error.code !== "23505") {
+    throw error;
+  }
+}
+  
   async function handleResidentAuth(action) {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
