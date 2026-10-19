@@ -323,6 +323,43 @@
 
   <p id="resident-auth-message" role="status" aria-live="polite"></p>
 </section>
+
+<!-- Terms & Policies Modal -->
+<div id="policy-modal" role="dialog" aria-modal="true"
+     aria-labelledby="policy-modal-title"
+     style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+
+  <div style="background:white;color:#102a43;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;border-radius:16px;padding:24px;box-sizing:border-box;font-family:Arial,sans-serif;">
+
+    <h2 id="policy-modal-title">Before you join</h2>
+    <p>Please review our policies before creating your account on Mulund Civic Hub.</p>
+
+    <ul>
+      <li><a href="#privacy-policy">Privacy Policy</a></li>
+      <li><a href="#community-rules">Terms & Community Rules</a></li>
+      <li><a href="#moderation-policy">Moderation Policy</a></li>
+      <li><a href="#grievance-procedure">Grievance Procedure</a></li>
+    </ul>
+
+    <label style="display:flex;gap:10px;align-items:flex-start;margin:20px 0;line-height:1.5;">
+      <input id="policy-accept" type="checkbox" style="margin-top:4px;flex-shrink:0;">
+      <span>I agree to the Terms & Community Rules and acknowledge the Privacy, Moderation and Grievance policies.</span>
+    </label>
+
+    <p id="policy-message" role="status" aria-live="polite"></p>
+
+    <button id="policy-continue" type="button"
+      style="width:100%;padding:13px;background:#155eef;color:white;border:0;border-radius:8px;margin-bottom:10px;">
+      Accept & Continue
+    </button>
+
+    <button id="policy-close" type="button"
+      style="width:100%;padding:13px;background:#e2e8f0;color:#102a43;border:0;border-radius:8px;">
+      Close
+    </button>
+
+  </div>
+</div>
   
 <script>
   const authMessage = document.getElementById("resident-auth-message");
