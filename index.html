@@ -751,5 +751,103 @@ complaints.forEach(c => {
   <div id="community-post-list"></div>
 </section>
   
+<script>
+document.getElementById("community-load").addEventListener("click", async function () {
+  const message = document.getElementById("community-message");
+  const list = document.getElementById("community-post-list");
+
+  message.textContent = "Loading community posts...";
+  list.replaceChildren();
+
+  try {
+    const { data: posts, error } = await civicSupabase
+      .from("approved_community_feed")
+      .select("post_id, title, category, area, description, created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    if (!posts || posts.length === 0) {
+      message.textContent = "No approved community posts yet.";
+      return;
+    }
+
+    for (const post of posts) {
+      const { count, error: voteError } = await civicSupabase
+        .from("community_votes")
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", post.post_id);
+
+      const card = document.createElement("article");
+      card.style.cssText =
+        "background:white;padding:16px;margin:12px 0;border:1px solid #cbd5e1;border-radius:12px;overflow-wrap:anywhere;";
+
+      const title = document.createElement("h3");
+      title.textContent = post.title;
+
+      const details = document.createElement("p");
+      details.textContent = post.category + " · " + post.area;
+
+      const description = document.createElement("p");
+      description.textContent = post.description;
+
+      const votes = document.createElement("p");
+      votes.textContent = voteError
+        ? "Vote count unavailable"
+        : "👍 " + count + " unique upvotes";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "👍 Upvote";
+      button.style.cssText =
+        "padding:10px 14px;background:#155eef;color:white;border:0;border-radius:8px;";
+
+      button.addEventListener("click", async function () {
+        button.disabled = true;
+
+        try {
+          const { data: userData, error: authError } =
+            await civicSupabase.auth.getUser();
+
+          if (authError || !userData.user) {
+            message.textContent = "Please sign in to upvote.";
+            return;
+          }
+
+          const { error: insertError } = await civicSupabase
+            .from("community_votes")
+            .insert({
+              post_id: post.post_id,
+              user_id: userData.user.id
+            });
+
+          if (insertError) {
+            message.textContent = insertError.code === "23505"
+              ? "You have already upvoted this post."
+              : "Could not record your vote. Please try again.";
+            return;
+          }
+
+          message.textContent = "Vote recorded!";
+          document.getElementById("community-load").click();
+        } catch (error) {
+          message.textContent = "Something went wrong. Please try again.";
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      card.append(title, details, description, votes, button);
+      list.append(card);
+    }
+
+    message.textContent = "Community posts loaded: " + list.children.length;
+  } catch (error) {
+    console.error("Community loading failed:", error);
+    message.textContent = "Could not load posts. Please try again.";
+  }
+});
+</script>
+  
 </body>
 </html>
