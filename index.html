@@ -467,13 +467,14 @@ policyClose.addEventListener("click", () => {
   policyModal.style.display = "none";
 });
 
-policyContinue.addEventListener("click", async () => {
+  policyContinue.addEventListener("click", async () => {
   if (!policyAccept.checked) {
     policyMessage.textContent =
       "Please accept the required terms before continuing.";
     return;
   }
 
+  localStorage.setItem("mch_pending_policy_acceptance_v1", "true");
   policyModal.style.display = "none";
   await handleResidentAuth("signup");
 });
