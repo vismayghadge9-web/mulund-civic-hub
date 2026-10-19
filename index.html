@@ -474,6 +474,82 @@
     }
   );
 </script>
+ 
+<section id="my-complaints" style="max-width:650px;margin:30px auto;padding:24px;background:#f1f5f9;border-radius:16px;font-family:Arial,sans-serif;color:#102a43;">
+  <h2>My Complaints</h2>
+  <p>View the civic issues you have reported and their latest status.</p>
+  <button id="load-my-complaints" type="button" style="padding:12px 18px;background:#155eef;color:white;border:0;border-radius:8px;font-weight:bold;">View My Complaints</button>
+  <p id="my-complaints-message" role="status" aria-live="polite"></p>
+  <div id="my-complaints-list"></div>
+</section>
+  
+<script>
+  document.getElementById("load-my-complaints").addEventListener(
+    "click",
+    async function () {
+      const message = document.getElementById("my-complaints-message");
+      const list = document.getElementById("my-complaints-list");
+
+      message.textContent = "Loading your complaints...";
+      list.replaceChildren();
+
+      try {
+        const { data: sessionData, error: sessionError } =
+          await civicSupabase.auth.getSession();
+
+        if (sessionError || !sessionData.session) {
+          message.textContent = "Please sign in to view your complaints.";
+          return;
+        }
+
+        const { data, error } = await civicSupabase
+          .from("complaints")
+          .select("id, title, category, area, description, status, created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Complaint loading failed:", error.message);
+          message.textContent = "Could not load complaints. Please try again.";
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          message.textContent = "You haven't submitted any complaints yet.";
+          return;
+        }
+
+        message.textContent = "Your complaints: " + data.length;
+
+        data.forEach(function (item) {
+          const card = document.createElement("article");
+          const title = document.createElement("h3");
+          const status = document.createElement("p");
+          const details = document.createElement("p");
+          const date = document.createElement("p");
+
+          title.textContent = item.title;
+          status.textContent = "Status: " + item.status;
+          details.textContent =
+            item.category + " · " + item.area + " — " + item.description;
+          date.textContent =
+            "Submitted: " + new Date(item.created_at).toLocaleString();
+
+          card.style.cssText =
+            "background:white;border:1px solid #cbd5e1;border-radius:12px;padding:16px;margin:12px 0;overflow-wrap:anywhere;";
+          status.style.cssText =
+            "display:inline-block;background:#dbeafe;padding:6px 10px;border-radius:20px;font-weight:bold;";
+          details.style.color = "#475569";
+          date.style.cssText = "font-size:12px;color:#64748b;";
+
+          card.append(title, status, details, date);
+          list.append(card);
+        });
+      } catch (error) {
+        message.textContent = "Something went wrong. Please try again.";
+      }
+    }
+  );
+</script>
   
 </body>
 </html>
