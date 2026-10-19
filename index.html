@@ -979,6 +979,150 @@ document.getElementById("community-load").addEventListener("click", async functi
   });
 })();
 </script>
+ 
+<script>
+(function () {
+  const loadButton = document.getElementById("admin-load-community");
+  const message = document.getElementById("admin-community-message");
+  const list = document.getElementById("admin-community-list");
+
+  if (!loadButton || !message || !list) return;
+
+  loadButton.addEventListener("click", async function () {
+    loadButton.disabled = true;
+    message.textContent = "Checking admin access...";
+    list.replaceChildren();
+
+    try {
+      const { data: authData, error: authError } =
+        await civicSupabase.auth.getUser();
+
+      if (authError || !authData.user) {
+        message.textContent = "Please sign in with your admin account.";
+        return;
+      }
+
+      const { data: admin, error: adminError } = await civicSupabase
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", authData.user.id)
+        .maybeSingle();
+
+      if (adminError || !admin) {
+        message.textContent = "Admin access required.";
+        return;
+      }
+
+      message.textContent = "Loading pending proposals...";
+
+      const { data: proposals, error } = await civicSupabase
+        .from("community_posts")
+        .select("complaint_id, display_anonymous, created_at, complaints(title, category, area, description)")
+        .eq("approved", false)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      if (!proposals || proposals.length === 0) {
+        message.textContent = "No pending proposals.";
+        return;
+      }
+
+      for (const proposal of proposals) {
+        const complaint = proposal.complaints;
+
+        if (!complaint) continue;
+
+        const card = document.createElement("article");
+        card.style.cssText =
+          "background:white;padding:16px;margin:12px 0;border:1px solid #cbd5e1;border-radius:12px;overflow-wrap:anywhere;";
+
+        const title = document.createElement("h4");
+        title.textContent = complaint.title;
+
+        const details = document.createElement("p");
+        details.textContent =
+          complaint.category + " · " + complaint.area;
+
+        const description = document.createElement("p");
+        description.textContent = complaint.description;
+
+        const privacy = document.createElement("p");
+        privacy.textContent = proposal.display_anonymous
+          ? "Resident requested anonymity."
+          : "Resident did not request anonymity.";
+
+        const approveButton = document.createElement("button");
+        approveButton.type = "button";
+        approveButton.textContent = "Approve for Community";
+        approveButton.style.cssText =
+          "padding:10px 14px;background:#15803d;color:white;border:0;border-radius:8px;";
+
+        approveButton.addEventListener("click", async function () {
+          approveButton.disabled = true;
+          message.textContent = "Approving proposal...";
+
+          try {
+            const { data: currentAuth, error: currentAuthError } =
+              await civicSupabase.auth.getUser();
+
+            if (currentAuthError || !currentAuth.user) {
+              message.textContent = "Please sign in again.";
+              return;
+            }
+
+            const { data: stillAdmin, error: checkError } =
+              await civicSupabase
+                .from("admin_users")
+                .select("user_id")
+                .eq("user_id", currentAuth.user.id)
+                .maybeSingle();
+
+            if (checkError || !stillAdmin) {
+              message.textContent = "Admin access required.";
+              return;
+            }
+
+            const { error: updateError } = await civicSupabase
+              .from("community_posts")
+              .update({ approved: true })
+              .eq("complaint_id", proposal.complaint_id)
+              .eq("approved", false);
+
+            if (updateError) throw updateError;
+
+            message.textContent =
+              "Approval request sent. Reload proposals to verify.";
+            card.remove();
+          } catch (error) {
+            console.error("Community approval failed:", error);
+            message.textContent =
+              "Approval failed. Check admin permissions and try again.";
+          } finally {
+            approveButton.disabled = false;
+          }
+        });
+
+        card.append(title, details, description, privacy, approveButton);
+        list.append(card);
+      }
+
+      if (list.children.length > 0) {
+        message.textContent =
+          "Pending proposals loaded: " + list.children.length;
+      } else {
+        message.textContent = "No pending proposals found.";
+      }
+    } catch (error) {
+      console.error("Loading proposals failed:", error);
+      message.textContent =
+        "Could not load proposals. Check the database permissions.";
+    } finally {
+      loadButton.disabled = false;
+    }
+  });
+})();
+</script>
   
 </body>
 </html>
