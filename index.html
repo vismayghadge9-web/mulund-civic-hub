@@ -419,5 +419,61 @@
   </form>
 </section>
 
+<script>
+  document.getElementById("complaint-form").addEventListener(
+    "submit",
+    async function (event) {
+      event.preventDefault();
+
+      const message = document.getElementById("complaint-message");
+      const submitButton = this.querySelector('button[type="submit"]');
+
+      submitButton.disabled = true;
+      message.textContent = "Submitting your complaint...";
+
+      try {
+        const { data: userData, error: userError } =
+          await civicSupabase.auth.getUser();
+
+        if (userError || !userData.user) {
+          message.textContent =
+            "Please sign in before submitting a complaint.";
+          return;
+        }
+
+        const complaint = {
+          user_id: userData.user.id,
+          title: document.getElementById("complaint-title").value.trim(),
+          category: document.getElementById("complaint-category").value,
+          area: document.getElementById("complaint-area").value.trim(),
+          description: document
+            .getElementById("complaint-description").value.trim(),
+          status: "Submitted"
+        };
+
+        const { error } = await civicSupabase
+          .from("complaints")
+          .insert(complaint);
+
+        if (error) {
+          console.error("Complaint submission failed:", error.message);
+          message.textContent =
+            "Could not submit your complaint. Please sign in and try again.";
+          return;
+        }
+
+        this.reset();
+        message.textContent =
+          "Complaint submitted successfully! Your report has been recorded.";
+      } catch (error) {
+        message.textContent =
+          "Something went wrong. Please try again.";
+      } finally {
+        submitButton.disabled = false;
+      }
+    }
+  );
+</script>
+  
 </body>
 </html>
