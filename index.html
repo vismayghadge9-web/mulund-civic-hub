@@ -870,5 +870,99 @@ document.getElementById("community-load").addEventListener("click", async functi
 });
 </script>
   
+<script>
+(async function () {
+  const select = document.getElementById("community-complaint-select");
+  const proposeButton = document.getElementById("community-propose");
+  const message = document.getElementById("community-propose-message");
+
+  if (!select || !proposeButton || !message) return;
+
+  try {
+    const { data: userData, error: authError } =
+      await civicSupabase.auth.getUser();
+
+    if (authError || !userData.user) {
+      select.replaceChildren(new Option("Sign in to load complaints", ""));
+      message.textContent = "Please sign in before proposing an issue.";
+      return;
+    }
+
+    const { data: complaints, error } = await civicSupabase
+      .from("complaints")
+      .select("id, title, category, area")
+      .eq("user_id", userData.user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    select.replaceChildren(new Option("Choose a complaint", ""));
+
+    for (const complaint of complaints || []) {
+      const option = new Option(
+        complaint.title + " — " + complaint.category + " (" + complaint.area + ")",
+        complaint.id
+      );
+      select.add(option);
+    }
+
+    if (!complaints || complaints.length === 0) {
+      select.replaceChildren(new Option("No complaints found", ""));
+      message.textContent = "Submit a complaint before proposing it.";
+    }
+  } catch (error) {
+    console.error("Could not load resident complaints:", error);
+    message.textContent = "Could not load complaints. Please refresh and try again.";
+  }
+
+  proposeButton.addEventListener("click", async function () {
+    proposeButton.disabled = true;
+    message.textContent = "Submitting proposal...";
+
+    try {
+      const { data: userData, error: authError } =
+        await civicSupabase.auth.getUser();
+
+      if (authError || !userData.user) {
+        message.textContent = "Please sign in first.";
+        return;
+      }
+
+      const complaintId = select.value;
+
+      if (!complaintId) {
+        message.textContent = "Please select a complaint first.";
+        return;
+      }
+
+      const { error } = await civicSupabase
+        .from("community_posts")
+        .insert({
+          complaint_id: complaintId,
+          display_anonymous:
+            document.getElementById("community-anonymous").checked
+        });
+
+      if (error) {
+        message.textContent = error.code === "23505"
+          ? "This complaint has already been proposed."
+          : "Proposal failed. Please try again.";
+        console.error("Community proposal failed:", error);
+        return;
+      }
+
+      message.textContent =
+        "Proposal submitted for admin approval. It is not public yet.";
+      select.value = "";
+    } catch (error) {
+      console.error("Proposal submission failed:", error);
+      message.textContent = "Something went wrong. Please try again.";
+    } finally {
+      proposeButton.disabled = false;
+    }
+  });
+})();
+</script>
+  
 </body>
 </html>
