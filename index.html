@@ -413,15 +413,38 @@
     }
   }
 
-  document.getElementById("resident-signup").addEventListener(
-    "click",
-    () => handleResidentAuth("signup")
-  );
+const policyModal = document.getElementById("policy-modal");
+const policyAccept = document.getElementById("policy-accept");
+const policyContinue = document.getElementById("policy-continue");
+const policyClose = document.getElementById("policy-close");
+const policyMessage = document.getElementById("policy-message");
 
-  document.getElementById("resident-login").addEventListener(
-    "click",
-    () => handleResidentAuth("login")
-  );
+document.getElementById("resident-signup").addEventListener("click", () => {
+  policyAccept.checked = false;
+  policyMessage.textContent = "";
+  policyModal.style.display = "flex";
+});
+
+policyClose.addEventListener("click", () => {
+  policyModal.style.display = "none";
+});
+
+policyContinue.addEventListener("click", async () => {
+  if (!policyAccept.checked) {
+    policyMessage.textContent =
+      "Please accept the required terms before continuing.";
+    return;
+  }
+
+  policyModal.style.display = "none";
+  await handleResidentAuth("signup");
+});
+
+document.getElementById("resident-login").addEventListener(
+  "click",
+  () => handleResidentAuth("login")
+);
+  
 </script>
   
 <section id="report" style="max-width:650px;margin:30px auto;padding:24px;background:#f1f5f9;border-radius:16px;font-family:Arial,sans-serif;color:#102a43;">
