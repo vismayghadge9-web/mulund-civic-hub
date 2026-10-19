@@ -747,7 +747,29 @@ complaints.forEach(c => {
   </button>
 
   <p id="community-message" role="status" aria-live="polite"></p>
-  <div id="community-post-list"></div>
+  
+<div style="background:white;padding:16px;border-radius:12px;margin:16px 0;">
+  <h3>Propose a Community Issue</h3>
+  <p>Select one of your complaints to suggest it for the public community feed. An admin must approve it first.</p>
+
+  <label for="community-complaint-select">Your complaint</label>
+  <select id="community-complaint-select" style="display:block;width:100%;padding:12px;margin:8px 0 12px;border:1px solid #cbd5e1;border-radius:8px;">
+    <option value="">Load your complaints first</option>
+  </select>
+
+  <label style="display:block;margin:10px 0;">
+    <input type="checkbox" id="community-anonymous">
+    Show my proposal anonymously
+  </label>
+
+  <button id="community-propose" type="button" style="padding:12px 18px;background:#155eef;color:white;border:0;border-radius:8px;font-weight:bold;">
+    Propose Issue
+  </button>
+  <p id="community-propose-message" role="status" aria-live="polite"></p>
+</div>
+
+<div id="community-post-list"></div>
+  
 </section>
   
 <script>
