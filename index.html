@@ -325,5 +325,68 @@
   <p id="resident-auth-message" role="status" aria-live="polite"></p>
 </section>
   
+<script>
+  const authMessage = document.getElementById("resident-auth-message");
+  const emailInput = document.getElementById("resident-email");
+  const passwordInput = document.getElementById("resident-password");
+
+  async function handleResidentAuth(action) {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || password.length < 8) {
+      authMessage.textContent =
+        "Enter a valid email and a password of at least 8 characters.";
+      return;
+    }
+
+    authMessage.textContent = "Please wait...";
+
+    try {
+      let result;
+
+      if (action === "signup") {
+        result = await civicSupabase.auth.signUp({
+          email,
+          password
+        });
+      } else {
+        result = await civicSupabase.auth.signInWithPassword({
+          email,
+          password
+        });
+      }
+
+      if (result.error) {
+        authMessage.textContent = result.error.message;
+        return;
+      }
+
+      if (action === "signup" && !result.data.session) {
+        authMessage.textContent =
+          "Account created! Check your email to confirm your account.";
+      } else {
+        authMessage.textContent =
+          action === "signup"
+            ? "Account created and signed in successfully!"
+            : "Signed in successfully!";
+      }
+    } catch (error) {
+      authMessage.textContent =
+        "Something went wrong. Please try again.";
+    }
+  }
+
+  document.getElementById("resident-signup").addEventListener(
+    "click",
+    () => handleResidentAuth("signup")
+  );
+
+  document.getElementById("resident-login").addEventListener(
+    "click",
+    () => handleResidentAuth("login")
+  );
+</script>
+  
 </body>
 </html>
