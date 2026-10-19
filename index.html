@@ -582,5 +582,90 @@
   <div id="admin-complaints-list"></div>
 </section>
   
+<script>
+document.getElementById("admin-load-complaints").addEventListener("click", async function () {
+  const message = document.getElementById("admin-message");
+  const list = document.getElementById("admin-complaints-list");
+
+  message.textContent = "Checking admin access...";
+  list.replaceChildren();
+
+  try {
+    const { data: userData, error: userError } =
+      await civicSupabase.auth.getUser();
+
+    if (userError || !userData.user) {
+      message.textContent = "Please sign in with your admin account first.";
+      return;
+    }
+
+    const { data: adminRecord, error: adminError } =
+      await civicSupabase
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+
+    if (adminError || !adminRecord) {
+      message.textContent = "Admin access denied. Sign in with your approved admin account.";
+      return;
+    }
+
+    const { data, error } = await civicSupabase
+      .from("complaints")
+      .select("id, title, category, area, description, status, created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      message.textContent = "Could not load complaints. Please try again.";
+      return;
+    }
+
+    const complaints = data || [];
+
+    document.getElementById("admin-total").textContent = complaints.length;
+    document.getElementById("admin-submitted").textContent =
+      complaints.filter(c => c.status === "Submitted").length;
+    document.getElementById("admin-progress").textContent =
+      complaints.filter(c => c.status === "In Progress").length;
+    document.getElementById("admin-resolved").textContent =
+      complaints.filter(c => c.status === "Resolved").length;
+
+    if (!complaints.length) {
+      message.textContent = "No complaints have been submitted yet.";
+      return;
+    }
+
+    complaints.forEach(c => {
+      const card = document.createElement("article");
+      card.style.cssText =
+        "background:white;padding:16px;margin:12px 0;border:1px solid #cbd5e1;border-radius:12px;overflow-wrap:anywhere;";
+
+      const title = document.createElement("h3");
+      title.textContent = c.title;
+
+      const details = document.createElement("p");
+      details.textContent = c.category + " · " + c.area;
+
+      const description = document.createElement("p");
+      description.textContent = c.description;
+
+      const status = document.createElement("p");
+      status.textContent = "Current status: " + c.status;
+
+      const date = document.createElement("p");
+      date.textContent = "Submitted: " + new Date(c.created_at).toLocaleString();
+
+      card.append(title, details, description, status, date);
+      list.append(card);
+    });
+
+    message.textContent = "Loaded " + complaints.length + " complaint(s).";
+  } catch (error) {
+    message.textContent = "Something went wrong. Please try again.";
+  }
+});
+</script>
+  
 </body>
 </html>
