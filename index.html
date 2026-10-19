@@ -414,14 +414,37 @@ async function savePolicyAcceptance(userId) {
         return;
       }
 
-      if (action === "signup" && !result.data.session) {
+      if (action === "signup") {
+        if (!result.data.session) {
+          localStorage.setItem(
+            "mch_pending_policy_acceptance_v1",
+            "true"
+          );
+          authMessage.textContent =
+            "Account created! Check your email to confirm your account, then sign in on this device to finish recording policy acceptance.";
+          return;
+        }
+
+        await savePolicyAcceptance(result.data.user.id);
+        localStorage.removeItem("mch_pending_policy_acceptance_v1");
         authMessage.textContent =
-          "Account created! Check your email to confirm your account.";
+          "Account created, signed in, and policy acceptance recorded.";
       } else {
-        authMessage.textContent =
-          action === "signup"
-            ? "Account created and signed in successfully!"
-            : "Signed in successfully!";
+        const user = result.data.user;
+
+        if (
+          user &&
+          localStorage.getItem("mch_pending_policy_acceptance_v1") === "true"
+        ) {
+          await savePolicyAcceptance(user.id);
+          localStorage.removeItem("mch_pending_policy_acceptance_v1");
+          authMessage.textContent =
+            "Signed in successfully. Policy acceptance recorded.";
+        } else {
+          authMessage.textContent = "Signed in successfully!";
+        }
+      }
+      
       }
     } catch (error) {
       authMessage.textContent =
