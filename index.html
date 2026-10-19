@@ -244,7 +244,6 @@
       </div>
     </section>
   </main>
-
   <footer>
     <div class="container footer-inner">
       <div>
@@ -254,6 +253,61 @@
       <p>Independent civic information platform · Initial preview</p>
     </div>
     <div class="container small-note">This website is not an official government website. Confirm civic information with the relevant authority.</div>
-  </footer>
+  </footer> 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://wrifafqxrxizredibjzj.supabase.co";
+  const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+  const civicSupabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  async function loadAnnouncements() {
+    const { data, error } = await civicSupabase
+      .from("announcements")
+      .select("title, message, area, created_at")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Could not load announcements:", error.message);
+      return;
+    }
+
+    const notice = document.querySelector("#updates .notice");
+    if (!notice) return;
+
+    notice.replaceChildren();
+
+    if (!data || data.length === 0) {
+      notice.textContent = "No announcements published yet.";
+      return;
+    }
+
+    data.forEach((item) => {
+      const wrapper = document.createElement("div");
+      const title = document.createElement("strong");
+      const message = document.createElement("p");
+      const area = document.createElement("p");
+
+      title.textContent = item.title;
+      message.textContent = item.message;
+      area.textContent = "Area: " + item.area;
+
+      message.style.color = "#61718a";
+      area.style.color = "#61718a";
+      area.style.fontSize = "12px";
+
+      wrapper.append(title, message, area);
+      notice.append(wrapper);
+    });
+  }
+
+  loadAnnouncements();
+</script>
+</body>
+  
 </body>
 </html>
