@@ -308,6 +308,22 @@
   loadAnnouncements();
 </script>
 </body>
+
+<section id="resident-account" style="max-width:600px;margin:30px auto;padding:24px;background:#f1f5f9;border-radius:16px;font-family:Arial,sans-serif;color:#102a43;">
+  <h2>Resident Account</h2>
+  <p>Sign in or create an account to manage your civic complaints.</p>
+
+  <label for="resident-email">Email address</label>
+  <input id="resident-email" type="email" placeholder="Enter your email" autocomplete="email" style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border:1px solid #cbd5e1;border-radius:8px;">
+
+  <label for="resident-password">Password</label>
+  <input id="resident-password" type="password" placeholder="At least 8 characters" autocomplete="current-password" style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border:1px solid #cbd5e1;border-radius:8px;">
+
+  <button id="resident-signup" type="button" style="padding:12px 16px;margin:4px;background:#155eef;color:white;border:0;border-radius:8px;">Create account</button>
+  <button id="resident-login" type="button" style="padding:12px 16px;margin:4px;background:#102a43;color:white;border:0;border-radius:8px;">Sign in</button>
+
+  <p id="resident-auth-message" role="status" aria-live="polite"></p>
+</section>
   
 </body>
 </html>
