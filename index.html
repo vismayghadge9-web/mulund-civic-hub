@@ -65,12 +65,22 @@ header {
     }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
     .logo {
-      display: grid; place-items: center;
-      width: 42px; height: 42px;
-      border-radius: 12px; background: var(--blue);
-      font-size: 21px;
-    }
-    .brand small { display: block; color: #c9d8f0; font-weight: 400; }
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
     
 .navlinks {
   display: flex;
