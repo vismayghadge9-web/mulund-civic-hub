@@ -370,16 +370,28 @@
 const POLICY_VERSION = "2026-10-19-v1";
 
 async function savePolicyAcceptance(userId) {
-  const { error } = await civicSupabase
+  const { data, error } = await civicSupabase
     .from("policy_acceptances")
     .insert({
       user_id: userId,
       policy_version: POLICY_VERSION
-    });
+    })
+    .select("id, policy_version")
+    .single();
 
   if (error && error.code !== "23505") {
     throw error;
   }
+
+  if (error?.code === "23505") {
+    return { alreadyRecorded: true };
+  }
+
+  if (!data) {
+    throw new Error("No acceptance record was returned.");
+  }
+
+  return { alreadyRecorded: false, data };
 }
   
   async function handleResidentAuth(action) {
