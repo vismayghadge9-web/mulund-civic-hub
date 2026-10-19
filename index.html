@@ -222,6 +222,92 @@ main {
 main section {
   scroll-margin-top: 24px;
 }
+   
+/* Sidebar layout */
+.app-layout {
+  display: flex;
+  align-items: flex-start;
+  min-height: 70vh;
+}
+
+.sidebar {
+  width: 230px;
+  flex: 0 0 230px;
+  min-height: 70vh;
+  padding: 24px 14px;
+  background: #102A43;
+  color: #FFFFFF;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+}
+
+.sidebar-heading {
+  padding: 0 12px 18px;
+  color: #93C5FD;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  color: #E5EEFF;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.sidebar-note {
+  margin: 24px 12px 0;
+  color: #B9C8DC;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+  .app-layout {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: 0;
+    padding: 12px;
+    position: static;
+  }
+
+  .sidebar-heading,
+  .sidebar-note {
+    display: none;
+  }
+
+  .sidebar-link {
+    display: inline-flex;
+    margin: 3px;
+    padding: 10px;
+  }
+
+  .sidebar-link span {
+    display: inline;
+  }
+}
     
   </style>
 </head>
