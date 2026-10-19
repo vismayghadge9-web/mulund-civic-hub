@@ -446,10 +446,11 @@ async function savePolicyAcceptance(userId) {
       }
       
       }
-    } catch (error) {
-      authMessage.textContent =
-        "Something went wrong. Please try again.";
-    }
+} catch (error) {
+  console.error("Resident auth error:", error);
+  authMessage.textContent =
+    "Error: " + (error.message || "Could not complete the operation.");
+  }
   }
 
 const policyModal = document.getElementById("policy-modal");
